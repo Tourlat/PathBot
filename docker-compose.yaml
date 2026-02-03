@@ -9,6 +9,7 @@ services:
       - ./config.json:/app/config.json:ro
     depends_on:
       - mongo
+      - redis
     networks:
       - pathbot-network
 
@@ -25,8 +26,37 @@ services:
     networks:
       - pathbot-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: pathbot-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - pathbot-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
+
 volumes:
   mongo-data:
+  redis-data:
 
 networks:
   pathbot-network:

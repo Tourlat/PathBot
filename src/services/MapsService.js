@@ -1,5 +1,6 @@
 const { Client } = require('@googlemaps/google-maps-services-js');
 const { mapsAPIKEY } = require('../../config.json');
+const cacheService = require('../rediscache/RedisCacheService');
 
 class MapsService {
     constructor() {
@@ -16,6 +17,16 @@ class MapsService {
      */
     async getRouteInfo(origin, destination, departureTime = null) {
         try {
+            // Generate cache key
+            const cacheKey = cacheService.generateRouteKey(origin, destination);
+            
+            // Try to get from cache first
+            const cachedData = await cacheService.get(cacheKey);
+            if (cachedData) {
+                return cachedData;
+            }
+        
+            
             const params = {
                 origin: origin,
                 destination: destination,
@@ -43,7 +54,7 @@ class MapsService {
             const route = response.data.routes[0];
             const leg = route.legs[0];
 
-            return {
+            const result = {
                 distance: leg.distance.text,
                 duration: leg.duration.text,
                 durationInTraffic: leg.duration_in_traffic ? leg.duration_in_traffic.text : null,
@@ -53,8 +64,14 @@ class MapsService {
                     leg.duration_in_traffic.value > leg.duration.value : false,
                 trafficDelay: leg.duration_in_traffic ?
                     Math.round((leg.duration_in_traffic.value - leg.duration.value) / 60) : 0,
-                polyline: route.overview_polyline?.points
+                polyline: route.overview_polyline?.points,
+                _cachedAt: Date.now()
             };
+            
+            // Store in cache with TTL
+            await cacheService.set(cacheKey, result);
+            
+            return result;
 
         } catch (error) {
             if (error.response) {
