@@ -1,0 +1,33 @@
+services:
+  pathbot:
+    build: .
+    container_name: pathbot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./config.json:/app/config.json:ro
+    depends_on:
+      - mongo
+    networks:
+      - pathbot-network
+
+  mongo:
+    image: mongo:7
+    container_name: pathbot-mongo
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=pathbot
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - pathbot-network
+
+volumes:
+  mongo-data:
+
+networks:
+  pathbot-network:
+    driver: bridge
