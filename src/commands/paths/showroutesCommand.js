@@ -16,7 +16,7 @@ module.exports = {
 
             if (Object.keys(userRoutes).length === 0) {
                 await interaction.editReply({
-                    content: '📭 You have no saved routes.\nUse `/saveroute` to create one.',
+                    content: '📭 You have no saved routes.\nUse `/save` to create one.',
                 });
                 return;
             }

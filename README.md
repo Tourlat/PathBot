@@ -24,7 +24,9 @@ A discord bot design to register and manage time paths for users using Google Ma
         "token": "YOUR_BOT_TOKEN",
         "clientId": "YOUR_CLIENT_ID",
         "guildId": "YOUR_GUILD_ID",
-        "mapsApiKey": "YOUR_MAPS_API_KEY"   
+        "mapsAPIKEY": "YOUR_MAPS_API_KEY",
+        "mongoUrl": "mongodb://mongo:27017/pathbot",
+        "redisUrl": "redis://redis:6379"
     }
     ```
 5. Start the bot:
@@ -61,10 +63,10 @@ Once the bot is running, you can interact with it on your Discord server using t
 
 ## Commands
 
-- `/saveroute` - Save a new route with an alias, origin, and destination.
-- `/deleteroute` - Delete a saved route by its alias.
+- `/save {alias} {origin} {destination}` - Save a new route with an alias, origin, and destination.
+- `/delete {alias}` - Delete a saved route by its alias.
 - `/showroutes` - Display all saved routes for the user.
-- `/times` - Get estimated travel times for all saved routes. Or for a specific route if an alias is provided.
-- `/route` - Get route information between two locations
+- `/times {alias (optionnal)}` - Get estimated travel times for all saved routes. Or for a specific route if an alias is provided.
+- `/route {origin} {destination}` - Get route information between two locations
 
 ---

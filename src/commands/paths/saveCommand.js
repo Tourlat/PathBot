@@ -3,7 +3,7 @@ const PathService = require('../../services/PathService');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('saveroute')
+        .setName('save')
         .setDescription('Save a new route with an alias')
         .addStringOption(option =>
             option.setName('alias')

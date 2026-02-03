@@ -3,7 +3,7 @@ const PathService = require('../../services/PathService');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('deleteroute')
+        .setName('delete')
         .setDescription('Delete a saved route')
         .addStringOption(option =>
             option.setName('alias')
