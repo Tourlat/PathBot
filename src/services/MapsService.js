@@ -74,10 +74,24 @@ class MapsService {
             return result;
 
         } catch (error) {
+            // Log error without sensitive data
+            console.error('Maps API error:', {
+                message: error.message,
+                status: error.response?.status,
+                timestamp: new Date().toISOString()
+            });
+            
             if (error.response) {
-                throw new Error(`Maps API Error (${error.response.status}): ${error.response.statusText}`);
+                const status = error.response.status;
+                if (status === 403) {
+                    throw new Error('Maps API access denied. Please check configuration.');
+                } else if (status === 429) {
+                    throw new Error('Rate limit exceeded. Please try again later.');
+                } else {
+                    throw new Error('Unable to retrieve route information.');
+                }
             }
-            throw new Error(`Error retrieving route information: ${error.message}`);
+            throw new Error('Unable to retrieve route information.');
         }
     }
 

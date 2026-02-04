@@ -24,7 +24,8 @@ class PathService {
 
             return routesObj;
         } catch (error) {
-            throw new Error(`Error retrieving routes: ${error.message}`);
+            console.error('Database error in getUserRoutes:', error.message);
+            throw new Error('Error retrieving routes from database');
         }
     }
 
@@ -64,10 +65,15 @@ class PathService {
 
             return routeData;
         } catch (error) {
+            console.error('Error in saveRoute:', error.message);
+            
             if (error.message.includes('duplicate key')) {
                 throw new Error(`Route with alias "${alias}" already exists.`);
             }
-            throw new Error(`Error saving route: ${error.message}`);
+            if (error.message.includes('already exists') || error.message.includes('Maximum')) {
+                throw error; // Re-throw custom errors
+            }
+            throw new Error('Unable to save route. Please check the addresses and try again.');
         }
     }
 
@@ -82,7 +88,12 @@ class PathService {
 
             return true;
         } catch (error) {
-            throw new Error(`Error deleting route: ${error.message}`);
+            console.error('Error in deleteRoute:', error.message);
+            
+            if (error.message.includes('not found')) {
+                throw error; // Re-throw custom error
+            }
+            throw new Error('Unable to delete route.');
         }
     }
 
@@ -101,7 +112,12 @@ class PathService {
                 createdAt: route.createdAt
             };
         } catch (error) {
-            throw new Error(`Error retrieving route: ${error.message}`);
+            console.error('Error in getRoute:', error.message);
+            
+            if (error.message.includes('not found')) {
+                throw error; // Re-throw custom error
+            }
+            throw new Error('Unable to retrieve route.');
         }
     }
 
@@ -114,7 +130,8 @@ class PathService {
 
             return await this.mapsService.getMultipleRoutesInfo(userRoutes);
         } catch (error) {
-            throw new Error(`Error retrieving routes with times: ${error.message}`);
+            console.error('Error in getAllUserRoutesWithTimes:', error.message);
+            throw new Error('Unable to retrieve routes with travel times.');
         }
     }
 }
